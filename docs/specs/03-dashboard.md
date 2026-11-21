@@ -33,12 +33,18 @@ Always visible, most important first:
 3. **Bottom bar:** Home, All reviews, **Ask analyst** (spec 04), Reply drafts
    (badge = unanswered bad reviews).
 
-Design rules: black and white with a little yellow (#FFD43B). Yellow only
-marks what matters most: "Do this next", the selected item, big rises, the Ask
-button. Never yellow text on white. Never colour alone (arrows, words and
-dashed outlines carry the meaning); touch targets ≥ 44 px; fits a 390 × 844
-screen. Streamlit can't match every detail; custom CSS + Plotly get close, and
-any gaps are noted in DECISIONS.md when we build (Day 3).
+Design rules: warm pastel palette on cream (#FBF3E4): teal #2F7F6E (summary
+card, good), coral #EE7B8E (problems, rising), yellow #F6B73C (Do this next,
+selection, Ask), lavender #B3A8F2 and peach #F7CBA4 as extra card colours,
+near-black #1F1D1B for text, the review card and the bottom bar. Elements: big
+rounded colourful cards, a decorative curve on the summary card, ranked #1 #2 #3
+rows with % rings, a line chart with a tooltip bubble, rounded vertical bars
+with values in white circles, pill toggles, round arrow buttons. Text on teal is
+white; text on coral, yellow, lavender and peach is near-black (for contrast).
+Never colour alone (arrows, words and dashed outlines carry the meaning); touch
+targets ≥ 44 px; fits a 390 × 844 screen. Streamlit can't match every detail;
+custom CSS + Plotly get close, and any gaps are noted in DECISIONS.md when we
+build (Day 3).
 
 ## Requirements
 - All numbers come from SQL queries in `src/metrics.py`, unit-tested.

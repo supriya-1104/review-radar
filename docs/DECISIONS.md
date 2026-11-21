@@ -79,8 +79,9 @@ portfolio.
   in tabs ordered by importance.
 - **Decision:** one 390 × 844 screen. Summary + "Do this next" always visible;
   tabs Fix first (default) → Working → Trends → Issues. "What bad reviews are
-  about" and "What changed" merged into Issues. Black/white with yellow only
-  for what matters most.
+  about" and "What changed" merged into Issues. Palette first black/white +
+  yellow, then changed to a warm pastel set (teal, coral, yellow, cream) from
+  a reference I liked; black/white felt flat.
 - **Trade-off:** far less scrolling and a clearer priority, but anything not in
   the default tab is one tap away and may go unseen; reviews behind a problem
   are shown one at a time. Check in owner interviews whether they open the other tabs.
