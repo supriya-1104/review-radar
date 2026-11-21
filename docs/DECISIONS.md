@@ -44,3 +44,30 @@ portfolio.
   public, so low risk; re-check terms before real owners use it). Keeping all
   LLM calls in one module so switching back is a small change.
 - **Result:**
+
+## D5: Dashboard order: answer first, proof after (2026-11-22)
+- **Context:** Spec 03 opened with number cards and a trend chart. The owner
+  checks the dashboard on a phone between services with ~10 minutes a week,
+  and the PRD's first job (J1) is a 30-second summary, which the spec lacked.
+- **Options:** numbers first (spec as written) · answer first: summary →
+  Fix this first → What's working → numbers and charts as proof.
+- **Decision:** answer first, plus a new summary card ending in "What to do
+  next". Agreed from a clickable phone mockup:
+  https://claude.ai/artifact/HSA5Z4xTQ5arGfruuXAcfK
+- **Trade-off:** owners who like to see the trend first must scroll; the
+  summary is LLM-written, so it carries the most hallucination risk and must
+  cite review IDs and use only SQL numbers.
+- **Result:**
+
+## D6: "This month" = last 30 days (2026-11-22)
+- **Context:** "This month" drives the header cards, "what bad reviews are
+  about" and "what changed". A calendar month is nearly empty early on.
+- **Options:** last 30 days · calendar month so far · last full calendar month.
+- **Decision:** last 30 days, compared with the previous 30 days ("last
+  month") and the average of the previous 3 × 30 days ("usual"). The 12-month
+  trend chart still uses calendar months, which owners read more easily.
+- **Trade-off:** always a full window of reviews and never out of date, but
+  "the last 30 days" doesn't match how owners say "November", so the dashboard
+  must show the exact date range. Two time definitions on one screen (30-day
+  cards, calendar-month chart) could confuse; check in owner interviews.
+- **Result:**
