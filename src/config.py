@@ -16,7 +16,7 @@ CACHE_DIR = DATA_DIR / "cache"  # gitignored: cached LLM + scraper results
 
 load_dotenv(ROOT / ".env")
 
-SECRET_KEYS = ["ANTHROPIC_API_KEY", "APIFY_TOKEN"]
+SECRET_KEYS = ["GEMINI_API_KEY", "APIFY_TOKEN"]
 SETTING_KEYS = ["MODEL_FAST", "MODEL_SMART"]
 
 

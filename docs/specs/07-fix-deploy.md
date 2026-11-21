@@ -13,7 +13,7 @@
 
 ## Deploy
 - Streamlit Community Cloud (free) from the GitHub repo; keys in app secrets.
-- Protect your money: Anthropic Console spend limit, Apify spend limit,
+- Protect your money: Google AI Studio usage limits (watch free-tier quotas), Apify spend limit,
   max 1 new place per visitor session, and **Demo mode** with your 3
   pre-analysed places so most visitors cost nothing.
 

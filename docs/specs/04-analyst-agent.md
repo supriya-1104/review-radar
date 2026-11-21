@@ -17,7 +17,7 @@ agent works out the steps itself, using tools, and asks before any action.
 | `compare_competitors(place, competitor_places)` (stretch) | side-by-side aspects | none |
 
 ## Requirements
-- Tool-use loop written directly with the Anthropic SDK; max 8 tool calls.
+- Tool-use loop written directly with the Gemini SDK (`google-genai`); max 8 tool calls.
 - Numbers in answers must come from tool results, never invented.
 - Before `save_reply`, show the draft with Approve / Edit / Reject.
 - Reply drafts: polite, specific to the complaint, no promises the owner didn't

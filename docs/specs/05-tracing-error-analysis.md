@@ -6,7 +6,7 @@ the skill AI PM job descriptions ask for most.
 
 ## Requirements
 - Add Arize Phoenix (local, free) with OpenInference instrumentation for the
-  Anthropic SDK so every LLM call and tool call is traced.
+  Google GenAI SDK so every LLM call and tool call is traced.
 - Write 30 realistic owner questions in `evals/questions.jsonl`, spread across
   your 3 places. Mix simple, multi-step, vague, and 5 with no good answer.
 - Run all 30.

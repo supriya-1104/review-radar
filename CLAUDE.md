@@ -21,8 +21,9 @@ language before writing code, and explain what you built afterwards.
 - Reviews come from the Apify Google Maps Reviews scraper via the `apify-client`
   package (`APIFY_TOKEN` in `.env`). The official Google Places API returns only
   5 reviews per place, so it is not used for reviews.
-- Anthropic Python SDK for all LLM work. Model names come from `.env`
-  (`MODEL_FAST`, `MODEL_SMART`); check the Anthropic docs if a model ID fails.
+- Google Gemini via the `google-genai` SDK for all LLM work (see D4 in
+  `docs/DECISIONS.md`). Model names come from `.env`
+  (`MODEL_FAST`, `MODEL_SMART`); check the Gemini docs if a model ID fails.
 - Local storage: one DuckDB or SQLite file in `data/` (places, reviews, aspects).
 - Streamlit + Plotly for the dashboard.
 - Arize Phoenix (local) for tracing LLM calls.

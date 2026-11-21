@@ -52,8 +52,8 @@ why the "Fix this first" formula, why the data source -->
 
 ## Architecture
 <!-- Ask Claude Code for a Mermaid diagram -->
-Maps link → Apify reviews actor → database → aspect tagging (Claude) → metrics
-(SQL) → dashboard (Streamlit) + analyst agent (Claude tool use, approval gate).
+Maps link → Apify reviews actor → database → aspect tagging (Gemini) → metrics
+(SQL) → dashboard (Streamlit) + analyst agent (Gemini tool use, approval gate).
 Traced with Arize Phoenix.
 
 ## What I'd do next
@@ -64,7 +64,7 @@ multi-outlet comparison for chains -->
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # add Anthropic key + Apify token
+cp .env.example .env   # add Gemini key + Apify token
 streamlit run src/app.py
 python -m evals.run_all
 ```
