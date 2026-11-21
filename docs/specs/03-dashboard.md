@@ -33,8 +33,13 @@ https://claude.ai/artifact/HSA5Z4xTQ5arGfruuXAcfK
 6. **What changed this month:** biggest rises and falls by aspect.
 7. **"Ask the analyst" button** (opens the agent, spec 04).
 
-Design rules: orange = problem, blue = good, never colour alone (arrows and
-words carry the meaning); touch targets ≥ 44 px; works at 390 px wide.
+Design rules: visual style = deep green + lime accent, big rounded cards,
+rating ring, tappable charts (see mockup). Coral = problem, green/lime = good,
+never colour alone (arrows and words carry the meaning); touch targets ≥ 44 px;
+works at 390 px wide. Interactions: tap a problem to expand its evidence, tap a
+month for its rating and sample size, toggle "last 30 days / usual".
+Streamlit can't match every detail; custom CSS + Plotly get close, and any
+gaps are noted in DECISIONS.md when we build (Day 3).
 
 ## Requirements
 - All numbers come from SQL queries in `src/metrics.py`, unit-tested.
