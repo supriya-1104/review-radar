@@ -100,3 +100,21 @@ portfolio.
   but owners can trust and act on what they read. Streamlit has no built-in
   scroll-synced tabs; needs a small custom component or anchor links (Day 3).
 - **Result:**
+
+## D9: Dishes from review text, not from bills (2026-11-22)
+- **Context:** Owners want to know which dishes people talk about. Idea: link
+  each review to the customer's bill and read the items they ordered.
+- **Options:** link reviews to bills (POS data) · extract dish names from the
+  review text · later, use aggregate sales per dish (no customer data).
+- **Decision:** v1 extracts dish names from review text in the same tagging
+  call (spec 02). Bill linking is out of scope. Aggregate sales per dish is a v2
+  idea to normalise complaints ("3 complaints per 1,000 biryanis sold").
+- **Why not bills:** a Google review has only a display name, so matching to a
+  bill is guesswork (group bills, walk-ins, reviews posted days later); linking
+  a public review to a private purchase record identifies customers, needs
+  consent (e.g. India's DPDP Act) and breaks our rule of hashing reviewer names;
+  it also needs an integration per billing system, far beyond 2 weeks.
+- **Trade-off:** we only see dishes reviewers chose to name, so quiet dishes are
+  invisible and popular dishes get more mentions. Aggregate sales data in v2
+  would correct for popularity.
+- **Result:**
