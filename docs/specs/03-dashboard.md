@@ -59,6 +59,8 @@ scrolls to that section; scrolling highlights the tab of the section on screen.
 - Label anything that could be confused (all-time Google rating vs last 30 days;
   calendar month vs last 30 days).
 - Every section has a one-line subtitle saying what it shows.
+- Chart axes are readable without guessing: months as 3 letters (Jan, Jun,
+  Jul, never J/J/J), with the year shown where it changes; y-axis in stars.
 
 Design rules: warm pastel palette on cream (#FBF3E4): teal #2F7F6E (summary
 card, good), coral #EE7B8E (problems, rising), yellow #F6B73C (Do this next,
