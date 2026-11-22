@@ -86,3 +86,17 @@ portfolio.
   the default tab is one tap away and may go unseen; reviews behind a problem
   are shown one at a time. Check in owner interviews whether they open the other tabs.
 - **Result:**
+
+## D8: Scroll or tap, and explicit numbers (2026-11-22)
+- **Context:** Reviewing the tabbed mockup (D7): numbers like "3.9 ▼0.4" and
+  "27%" were vague (of what? compared with what?), and hiding sections behind
+  tabs forced tapping when sometimes scrolling is more natural.
+- **Options:** tabs only (D7) · long scroll only (D5) · one scrolling page with
+  a sticky tab bar that jumps to sections and follows the scroll.
+- **Decision:** scroll + sticky tabs, kept in sync. Every number states what,
+  how many, compared with what, and over which period, with counts next to
+  percentages (rules in spec 03).
+- **Trade-off:** longer labels take more space and the page is longer again,
+  but owners can trust and act on what they read. Streamlit has no built-in
+  scroll-synced tabs; needs a small custom component or anchor links (Day 3).
+- **Result:**
