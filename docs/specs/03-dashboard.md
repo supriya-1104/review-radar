@@ -13,12 +13,13 @@ what to fix.
 Agreed from the clickable mockup (D5, D7, D8):
 https://claude.ai/artifact/HSA5Z4xTQ5arGfruuXAcfK
 
-The header and bottom bar stay fixed. Everything between them scrolls as one
-page, and a sticky tab bar lets the owner jump instead. Both stay in sync:
-tapping a tab scrolls to that section; scrolling highlights the tab of the
-section on screen.
+All sections sit on ONE normal scrolling page, so an owner can just keep
+scrolling and see everything (no hidden tab content). A tab bar sticks to the
+top once you scroll past the summary, and the bottom bar sticks to the bottom.
+Owners choose: scroll, or tap a tab to jump. Both stay in sync: tapping a tab
+scrolls to that section; scrolling highlights the tab of the section on screen.
 
-0. **Header (fixed):** place name, "All-time Google rating 4.2★ · 1,012
+0. **Header:** place name, "All-time Google rating 4.2★ · 1,012
    reviews" (labelled so it isn't confused with the 30-day number), Change place.
 1. **Summary card (J1):** "LAST 30 DAYS" + exact dates; big average rating with
    "from 41 new reviews" under it; two comparison tiles that show BOTH sides:
@@ -41,7 +42,7 @@ section on screen.
 6. **4 · All complaints:** what the 13 bad reviews mention, toggle "Last 30
    days / Usual 30 days", badges "↑ 7 more / same / ↓ 1 fewer", and a footnote
    defining "usual".
-7. **Bottom bar (fixed):** Home, All reviews, Ask analyst, Reply drafts (badge
+7. **Bottom bar (sticky):** Home, All reviews, Ask analyst, Reply drafts (badge
    = bad reviews with no reply yet).
 
 ## Clarity rules for every number (think like a Google PM)
