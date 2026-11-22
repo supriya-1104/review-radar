@@ -19,8 +19,10 @@ top once you scroll past the summary, and the bottom bar sticks to the bottom.
 Owners choose: scroll, or tap a tab to jump. Both stay in sync: tapping a tab
 scrolls to that section; scrolling highlights the tab of the section on screen.
 
-0. **Header:** place name, "All-time Google rating 4.2★ · 1,012
-   reviews" (labelled so it isn't confused with the 30-day number), Change place.
+0. **Header:** place name with a ▾ chevron (tap to switch between analysed
+   restaurants), "All-time Google rating 4.2★ · 1,012 reviews" (labelled so it
+   isn't confused with the 30-day number), and an "+ Add place" button (paste a
+   Google Maps link). Entry point for choosing a restaurant.
 1. **Summary card (J1):** "LAST 30 DAYS" + exact dates; big average rating with
    "from 41 new reviews" under it; two comparison tiles that show BOTH sides:
    "Previous 30 days 4.3★ · 33 reviews ▼ down 0.4 stars" and "Bad reviews
@@ -39,11 +41,14 @@ scrolls to that section; scrolling highlights the tab of the section on screen.
    labelled in stars; tap a dot for "November (1–22 Nov, so far): 3.9★ from 34
    reviews. Down 0.4★ from Oct (4.3★)". < 15 reviews = hollow dashed dot plus
    a "low confidence" sentence explaining why.
-6. **4 · All complaints:** what the 13 bad reviews mention, toggle "Last 30
-   days / Usual 30 days", badges "↑ 7 more / same / ↓ 1 fewer", and a footnote
-   defining "usual".
-7. **Bottom bar (sticky):** Home, All reviews, Ask analyst, Reply drafts (badge
-   = bad reviews with no reply yet).
+6. **4 · All complaints:** what the 13 bad reviews mention, toggle "This month
+   (24 Oct – 22 Nov) / A normal month (avg of 3 months before)", badges
+   "↑ 7 more / same / ↓ 1 fewer", and a footnote with exact date ranges. Use
+   "a normal month" (not "usual") everywhere in the UI.
+7. **Bottom bar (sticky), every icon has a text label:** Dashboard · All
+   reviews (full list, filterable) · Ask analyst (chat with the agent, spec 04) ·
+   Replies (reply drafts waiting for approval; badge = bad reviews with no reply
+   yet).
 
 ## Clarity rules for every number (think like a Google PM)
 - Say **what it is, how many, compared with what, over which period**:
