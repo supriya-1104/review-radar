@@ -52,3 +52,20 @@ agent" story.
 - **Claude Code feature learned:** plan -> approve -> build; background runs
   for slow jobs; before/after diffs to judge a prompt change.
 - **Commit(s):** tagging (spec 02); prompt + dish-merge fixes.
+
+## Day 3: 2026-11-25
+- **Goal:** real dashboard from the mockup: metrics first (tested), then
+  Streamlit.
+- **Prompts that worked:** "check the real data against each dashboard section
+  before building" found that the mockup's 30-day view would be empty for both
+  cafes (0 bad reviews with text in 30 days), which led to D13. Comparing two
+  Fix-first formulas side by side on real places (D14).
+- **What broke / surprised me:** the AI summary said "12 complaints" next to
+  "last 30 days" when the 12 were from 12 months: added a code check that the
+  period is named. "A normal month 100%" was based on 1 review: now shows the
+  sample size. Streamlit stacks columns on phones and hid a button icon behind
+  my font override; fixed with CSS.
+- **Claude Code feature learned:** checking the app in the browser pane at
+  phone size; the playbook's "rewind" to compare A vs B (we compared both in
+  one table instead).
+- **Commit(s):** metrics + A vs B; AI summary with checks; dashboard.

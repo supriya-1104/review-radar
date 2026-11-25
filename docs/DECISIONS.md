@@ -227,3 +227,24 @@ portfolio.
   aspects that appear in very angry reviews. Like A, it ignores how costly a
   fix is, which the owner knows better than we do.
 - **Result:**
+
+## D15: Dashboard in Streamlit: what matches the mockup and what doesn't (Day 3, 2026-11-25)
+- **Context:** Spec 03 says Streamlit can't match every mockup detail; note gaps.
+- **Decision:** native Streamlit widgets for anything interactive (place
+  switcher, + Add place, #1/#2/#3 pills, review ◀ ▶, This month / A normal
+  month toggle) and HTML/CSS for the cards; Plotly for the trend line. Sticky
+  tabs use CSS on Streamlit's element wrapper; the scroll highlight is a small
+  script in an invisible frame. All review text is HTML-escaped.
+- **Matches:** one scrolling phone-width page, summary card with both sides of
+  every comparison, sticky tabs that jump and follow the scroll, "Why #N" card,
+  one review at a time with the quote highlighted, pastel palette, labelled
+  bottom bar, hollow dots for low-confidence months, 3-letter months with years.
+- **Gaps:** you pick a problem with a "#1 #2 #3" pill above the rows rather
+  than tapping the row itself; the bar chart is horizontal HTML bars, not
+  rounded vertical bars; the place name is cut off in the switcher on narrow
+  phones; the bottom bar's All reviews / Ask analyst / Replies are placeholders
+  until Day 4; "Draft reply" is disabled until Day 4.
+- **Also fixed while checking on a phone:** "a normal month 100%" for Café
+  Coffee Day was based on 1 review, so comparisons now show their sample size
+  and say "too few earlier reviews" below 15.
+- **Result:**

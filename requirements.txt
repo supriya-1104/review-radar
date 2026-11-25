@@ -5,3 +5,5 @@ google-genai==3.6.1      # Gemini API (all LLM work)
 apify-client==3.5.1      # Google Maps reviews scraper
 python-dotenv==1.2.4     # reads keys from .env
 pytest==9.2.0            # tests
+streamlit==1.67.0        # dashboard (spec 03)
+plotly==7.2.0            # rating trend chart
