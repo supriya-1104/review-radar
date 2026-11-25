@@ -12,14 +12,26 @@ portfolio.
 - **Trade-off:** full review history and low cost, but relies on a third party
   and Google's terms; for a real product, owners would connect their Business
   Profile instead (the right long-term path).
-- **Result:**
+- **Result:** Compass Google Maps Reviews Scraper works (see D10): 1,149
+  reviews from 3 places for $0.61, exact dates, owner replies.
 
-## D2: Which 3 places (Day 1)
-- **Context:**
-- **Options:**
-- **Decision:**
-- **Trade-off:**
-- **Result:**
+## D2: Which 3 places (Day 1, 2026-11-25)
+- **Context:** Spec 01 suggests a busy restaurant, a small cafe and one non-food
+  place (clinic, salon, gym) to prove "works for any business". Places I know
+  are best, because I can judge whether the AI's findings are right.
+- **Options:** restaurant + cafe + non-food (spec) · three food places ·
+  add a 4th non-food place.
+- **Decision:** three food places in Bengaluru:
+  Meghana Foods, Residency Road (22,689 reviews: the busy one, biryani-heavy,
+  good for dish tagging); Café Coffee Day, Sampige Rd, Malleshwaram (926);
+  Sanshu's Coffee Co., RMV 2nd Stage (149: the small one).
+- **Trade-off:** focus on restaurants and cafes, where I can judge quality;
+  but "works for any place" is untested. Either soften that PRD claim or add a
+  non-food place before the demo.
+- **Result:** Café Coffee Day gets very few new reviews (8 in the last 6
+  months; its newest 500 go back to 2020). Nearly every month will be "low
+  confidence". Useful to show the dashboard staying honest, but a weak demo.
+  Sanshu's gets 3–19 a month, Meghana 60–109.
 
 ## D3: No agent framework (Day 1)
 - **Decision:** plain Gemini SDK tool loop (was Anthropic; see D4).
@@ -118,3 +130,39 @@ portfolio.
   invisible and popular dishes get more mentions. Aggregate sales data in v2
   would correct for popularity.
 - **Result:**
+
+## D10: Which Apify scraper (Day 1, 2026-11-25)
+- **Context:** Spec 01 asks to compare two Google Maps reviews actors on price,
+  exact dates and reliability. Tested both on 5 reviews of Sanshu's.
+- **Options:** `compass/Google-Maps-Reviews-Scraper` (72k users, $0.0006 per
+  review on the free plan) · `kaix/google-maps-reviews-scraper` (2.7k users,
+  $0.00004 per review, 15x cheaper).
+- **Decision:** Compass. Both give exact dates, review IDs and owner replies,
+  but Compass accepts short share links (maps.app.goo.gl) and Maps search URLs
+  (so "name, city" works), and returns place details (category, total reviews).
+  Kaix rejected short links.
+- **Trade-off:** ~$0.30 per 500 reviews vs ~$0.02. Fine for 3 places within
+  Apify's $5/month free credit, and the cache means each place is paid once.
+  At scale, Kaix (plus our own short-link expansion) would be worth re-testing.
+- **Result:** 3 places, 1,149 reviews, $0.61 total, 20–85 s per place
+  (spec target < 2 min).
+
+## D11: Storage = SQLite; newest 500 reviews per place (Day 1, 2026-11-25)
+- **Context:** CLAUDE.md allows DuckDB or SQLite. Spec 01 suggests newest 500,
+  last 12 months; the trend chart shows 12 months.
+- **Options:** SQLite (built into Python) · DuckDB (faster analytics, extra
+  package). Cap: newest 500 · last 12 months up to 1,000 or 3,000.
+- **Decision:** SQLite in `data/review_radar.db` (gitignored: it holds review
+  text). Newest 500 per place, no date filter.
+- **Trade-off:** no new dependency and plenty fast for thousands of rows. 500
+  is cheap and quick to tag, but for Meghana it covers only Jun–Nov 2026
+  (~6 months), so its 12-month trend chart will be half empty. Can raise the
+  cap just for busy places later (`--max`).
+- **Privacy detail:** the scraper's reviewer name, ID, profile link and photo
+  are removed in memory before anything is written to disk. Only a salted hash
+  of the reviewer ID is kept (to spot repeat reviewers); the salt lives in the
+  gitignored cache folder, so the hash can't be reversed by hashing known IDs.
+- **Result:** only 36–62% of reviews have text (Meghana: 181 of 500). The
+  aspect analysis (Day 2) will work on far fewer reviews than the star counts
+  suggest, so "bad reviews this month" numbers will be small. Keep counts
+  visible on the dashboard.

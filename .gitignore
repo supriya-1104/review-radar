@@ -8,3 +8,7 @@ data/cache/
 .phoenix/
 .DS_Store
 .streamlit/secrets.toml
+
+# Database holds scraped review text: never commit it
+data/*.db
+data/*.db-journal
