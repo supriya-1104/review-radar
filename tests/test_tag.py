@@ -40,6 +40,25 @@ def test_validate_keeps_good_tags_and_drops_bad_ones():
     assert stats["unknown_id"] == 1 and stats["missing_id"] == 0
 
 
+def test_generic_words_are_not_dishes():
+    batch = [("r1", "Coffee was cold but the filter coffee was great")]
+    answer = {"reviews": [{"id": "r1", "aspects": [], "dishes": [
+        {"dish_raw": "Coffee", "sentiment": "neg", "aspect": "food_quality", "quote": "Coffee was cold"},
+        {"dish_raw": "filter coffee", "sentiment": "pos", "aspect": "food_taste",
+         "quote": "filter coffee was great"}]}]}
+    result, stats = tag.validate(answer, batch)
+    assert [d["dish_raw"] for d in result["r1"]["dishes"]] == ["filter coffee"]
+    assert stats["generic_dish_dropped"] == 1
+
+
+def test_dish_spelling_variants_share_one_key():
+    keys = {tag.dish_key(n) for n in ["Biriyani", "biryani", "briyani", "biriyanis", "Biryani"]}
+    assert keys == {"biryani"}
+    assert tag.dish_key("Meghna Spl Biriyani") == tag.dish_key("Meghana's special biryani")
+    assert tag.dish_key("Chiken biryani") == "chicken biryani"
+    assert tag.dish_key("mutton biryani") != tag.dish_key("chicken biryani")
+
+
 def test_failed_batch_counts_every_review_as_missing():
     result, stats = tag.validate(None, BATCH)
     assert result == {} and stats["batch_failed"] == 1 and stats["missing_id"] == 2

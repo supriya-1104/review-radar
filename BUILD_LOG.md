@@ -20,3 +20,35 @@ agent" story.
   first, approve, then build; the decision log as a habit.
 - **Commit(s):** setup, Gemini switch, dashboard spec iterations (D5–D9),
   ingest (`python -m src.ingest`).
+
+## Day 2: 2026-11-25
+- **Goal:** tag what every review is about (11 aspects, D12) plus the dishes it
+  names (D9), and check the AI's accuracy by hand.
+- **Prompts that worked:** drafting the aspect list from 60 real reviews instead
+  of a generic list; "show me 20 random tagged reviews with their quotes".
+  Re-checking the SAME 20 reviews after each prompt change (fixed random seed),
+  so before/after is a fair comparison.
+- **What broke / surprised me:**
+  - First pass (Claude's hand-check of 20 Meghana reviews): ~17/20 right.
+    Misses: "very quick service" tagged as staff (should be wait time); "taste
+    is less than earlier" tagged neutral (should be negative); "Good food" got
+    no tag. Dish merges wrong: fresh lime soda -> Mint lime soda, filter coffee
+    -> Coffee.
+  - Fix 1 ("speed is always wait time") over-corrected: plain "service is
+    worst" became wait time. Fix 2 added "plain 'service' with no speed ->
+    staff" and "praise + complaint on one aspect -> negative". Lesson: every
+    prompt rule can break something else, so re-check the same sample.
+  - Dish merging was fixed in code, not the prompt: spelling variants
+    (biriyani/briyani/biryani) and word order are merged by a rule first; the
+    AI only judges the harder cases. Before that, "Biryani" and "Biriyani"
+    showed as two dishes.
+  - After both fixes, same 20 reviews: aspects 20/20 right, 1 dish missed
+    ("Good Biryani" not listed as a dish). 98–99.7% of quotes found word for
+    word; the rest are dropped automatically.
+  - Gemini's free tier often returns "503 busy": a full re-tag took 3–5 min per
+    place instead of 1–2. Fine for now; watch against the < 3 min target.
+- **My own hand-check:** (to fill in: run `python -m src.tag --place meghana
+  --sample 20` and count how many I agree with)
+- **Claude Code feature learned:** plan -> approve -> build; background runs
+  for slow jobs; before/after diffs to judge a prompt change.
+- **Commit(s):** tagging (spec 02); prompt + dish-merge fixes.

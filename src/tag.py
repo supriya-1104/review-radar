@@ -27,6 +27,11 @@ from src.aspects import ASPECTS, LABELS, SENTIMENTS
 BATCH = 20
 MIN_DISH_MENTIONS = 3  # dashboard shows only dishes with >= 3 mentions
 
+# Safety net if the model still tags a generic word as a dish.
+GENERIC_DISH_WORDS = {"food", "meal", "meals", "starter", "starters", "snack", "snacks",
+                      "veg", "non-veg", "non veg", "coffee", "tea", "drink", "drinks",
+                      "beverage", "beverages", "dessert", "desserts", "main course"}
+
 # ---------- text helpers ----------
 
 def clean_text(text: str | None) -> str:
@@ -96,14 +101,27 @@ Rules for aspects:
 - sentiment: pos, neg or neutral.
 - quote: copy the EXACT words from the review that support the tag (a short
   phrase, same spelling, no paraphrase, no added words).
-- Vague praise with no topic ("nice place", "good", "ok ok", "loved it") gets
-  NO aspects: return an empty list. Do not guess.
+- Speed is ALWAYS wait_time, never staff: "quick service", "slow service",
+  "took ages", "served fast" -> wait_time. staff is about behaviour,
+  attitude or skill (rude, polite, helpful, untrained). Plain "service was
+  bad/good/worst" with NO mention of speed or waiting -> staff.
+- Worse than before is NEGATIVE: "taste is less compared to earlier", "not like
+  before", "quality has dropped" -> neg, not neutral.
+- If one aspect gets both praise and a complaint in the same review ("food was
+  good, but taste is less than earlier"), tag it neg and quote the complaint:
+  the problem is what the owner needs to see.
+- Any opinion about the food or a dish counts as food_taste: "good food",
+  "tasty", "loved the biryani" -> food_taste pos (and list the dish if named).
+- Only praise with no topic at all ("nice place", "good experience", "ok ok",
+  "highly recommended", "good as usual") gets NO aspects: return an empty list.
+  Do not guess.
 - Reviews may be in Hinglish or have typos ("worst servise", "khana accha tha");
   tag them the same way.
 
 Also list DISHES: only specific named dishes or drinks (e.g. "chicken biryani",
-"paneer tikka", "cold coffee", "dal makhani"). Generic words like food, meal,
-starters, coffee in general ("great coffee"), snacks, veg, non-veg are NOT dishes.
+"paneer tikka", "filter coffee", "cappuccino", "dal makhani"). Generic words are
+NOT dishes: food, meal, starters, snacks, veg, non-veg, coffee, tea, drinks,
+beverages, desserts.
 For each dish: dish_raw (exactly as written), sentiment about that dish, the
 aspect the comment is about, and the exact quote.
 
@@ -129,9 +147,16 @@ def dish_prompt(place_name: str, raw_names: list[str]) -> str:
     return f"""These dish names were written by customers in reviews of "{place_name}".
 Group spelling variants and shorthand of the SAME dish under one clean canonical
 name in sentence case (e.g. "biriyani", "chkn biryani", "chicken biriyani" ->
-"Chicken biryani"). Keep genuinely different dishes apart (chicken biryani vs
-mutton biryani vs veg biryani). If a name is too vague to know which variant it
-is (just "biryani"), keep it as its own group ("Biryani").
+"Chicken biryani"). Only merge names that are clearly the SAME menu item.
+Keep different dishes apart even when they share words: chicken biryani vs
+mutton biryani vs veg biryani; fresh lime soda vs mint lime soda; filter coffee
+vs cold coffee; tiramisu latte vs tiramisu cold coffee. But names that differ
+only by the restaurant's own name or a "special"/"house" label are the house
+signature dish and DO belong together (e.g. "special biryani", "{place_name}
+special biryani", "{place_name} special chicken biryani"). Otherwise, when
+unsure, keep them apart. If a name is too vague to know which variant it is (just "biryani"),
+keep it as its own group ("Biryani"). The canonical name must be one of its
+own variants, never a name taken from another group.
 Every input name must appear in exactly one group's variants, spelled exactly
 as given.
 
@@ -173,6 +198,9 @@ def validate(data: dict | None, batch: list[tuple[str, str]]) -> tuple[dict, Cou
         for d in r.get("dishes") or []:
             if not d.get("dish_raw") or d.get("sentiment") not in SENTIMENTS:
                 stats["invalid_tag"] += 1
+                continue
+            if d["dish_raw"].strip().lower() in GENERIC_DISH_WORDS:
+                stats["generic_dish_dropped"] += 1
                 continue
             stats["quotes_checked"] += 1
             if not quote_found(d.get("quote", ""), texts[rid]):
@@ -238,20 +266,55 @@ def tag_place(conn, place_id: str, name: str) -> Counter:
     return total
 
 
+# Common spelling variants, fixed in code before the AI sees them, so
+# "Biriyani", "briyani" and "biryani" can never end up as separate dishes.
+SPELLING_FIXES = [
+    (r"\bb[ie]r[iy]+a?n[iy]+s?\b|\bbriyani\b|\bbirayani\b|\bbirinay\b", "biryani"),
+    (r"\bchiken\b|\bchkn\b", "chicken"),
+    (r"\bspl\.?\b", "special"),
+    (r"\bmeghna\b", "meghana"),
+]
+
+
+def dish_key(raw: str) -> str:
+    """Spelling-insensitive key: 'Meghna Spl Biriyani' -> 'meghana special biryani'."""
+    k = raw.lower().replace("’", "'").replace("'s ", " ").replace("&", "and")
+    k = re.sub(r"[^\w\s]", " ", k)
+    for pattern, fix in SPELLING_FIXES:
+        k = re.sub(pattern, fix, k)
+    return re.sub(r"\s+", " ", k).strip()
+
+
 def merge_dishes(conn, place_id: str, name: str) -> None:
     raws = [r[0] for r in conn.execute(
         "SELECT DISTINCT m.dish_raw FROM dish_mentions m JOIN reviews r USING (review_id) "
         "WHERE r.place_id = ? ORDER BY 1", (place_id,))]
     if not raws:
         return
-    data = llm.generate_json(dish_prompt(name, raws), DISH_SCHEMA) or {"groups": []}
-    mapping: dict[str, str] = {}
+    # Step 1 (code): group spelling and word-order variants
+    # ("special meghana biryani" = "meghana special biryani").
+    by_words = defaultdict(list)
+    for r in raws:
+        by_words[" ".join(sorted(dish_key(r).split()))].append(r)
+    by_key = {}
+    for members in by_words.values():
+        # Display the most common spelling in the group.
+        top = Counter(dish_key(m) for m in members).most_common(1)[0][0]
+        by_key[top] = members
+    keys = sorted(by_key)
+    # Step 2 (AI): merge the cleaned keys that are the same dish
+    # ("meghana special chicken biryani" + "special biryani").
+    data = llm.generate_json(dish_prompt(name, keys), DISH_SCHEMA) or {"groups": []}
+    key_to_dish: dict[str, str] = {}
     for g in data.get("groups", []):
         for v in g.get("variants", []):
-            if v in raws and v not in mapping and g.get("dish"):
-                mapping[v] = g["dish"].strip()
-    for r in raws:  # anything the model skipped keeps its own name
-        mapping.setdefault(r, r.strip().capitalize())
+            if v in by_key and v not in key_to_dish and g.get("dish"):
+                key_to_dish[v] = dish_key(g["dish"])
+    mapping: dict[str, str] = {}
+    for k, members in by_key.items():
+        canonical = key_to_dish.get(k, k).capitalize()  # sentence case: "Chicken biryani"
+        for r in members:
+            mapping[r] = canonical
     variants = defaultdict(list)
     for raw, dish in mapping.items():
         variants[dish].append(raw)
