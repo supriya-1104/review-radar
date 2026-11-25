@@ -10,6 +10,7 @@ If a check fails, a plain template sentence is used instead. Cached via llm.
 import re
 
 from src import llm, metrics
+from src.privacy import hide_names
 
 SCHEMA = {
     "type": "object",
@@ -46,7 +47,7 @@ def build_facts(s: metrics.Summary, w: metrics.Window, top: list, strengths: dic
         for i, m in enumerate(p.evidence[:4], 1):
             evidence[f"E{i}"] = m
         lines.append("Quotes about it: " + " | ".join(
-            f'{k}: "{m["quote"]}" ({m["stars"]} stars)' for k, m in evidence.items()))
+            f'{k}: "{hide_names(m["quote"])}" ({m["stars"]} stars)' for k, m in evidence.items()))
         if len(top) > 1:
             lines.append(f"Second problem: {top[1].label}, {top[1].n} complaints.")
     if strengths["items"]:

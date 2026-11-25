@@ -248,3 +248,23 @@ portfolio.
   Coffee Day was based on 1 review, so comparisons now show their sample size
   and say "too few earlier reviews" below 15.
 - **Result:**
+
+## D16: Hide names reviewers write about themselves (Day 3, 2026-11-25)
+- **Context:** The reviewer name field is never stored (D11), but some reviewers
+  introduce themselves in the text ("Hello, this is KRISHNA") or sign off
+  ("Regards, Priya"), so their name still showed on the dashboard. Staff are
+  also named in reviews ("the waiter, Sandeep").
+- **Options:** leave text as written · hide self-introduced and signed-off
+  reviewer names · hide every person's name (needs an AI name detector; would
+  also hide staff names).
+- **Decision:** hide reviewer self-names with a narrow rule in
+  `src/privacy.py` ("this is / my name is / myself / I am + capitalised
+  name", and sign-offs at the very end). Shown as "[name hidden]" on the
+  dashboard and in quotes sent to the summary model. Staff names stay visible
+  for now: owners need them for coaching (PRD J10), to be decided with owners.
+- **Trade-off:** simple and predictable, with tests for words it must not hide
+  ("I am very disappointed", "This is Meghana's best"). But a rule only catches
+  these patterns; a name written any other way ("Priya here, loved it") still
+  shows. Other identifying details ("I own a cafe named X") are not hidden.
+  The stored text is unchanged (the tagger's quotes must match it exactly).
+- **Result:** 1 of 470 reviews in our data had a self-introduced name; hidden.

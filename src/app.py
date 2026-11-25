@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src import db, metrics, summary
+from src.privacy import hide_names
 from src.tag import clean_text
 
 st.set_page_config(page_title="Review Radar", page_icon="📡", layout="centered")
@@ -268,8 +269,8 @@ else:
     idx = st.session_state.get(key, 0) % len(p.evidence)
     m = p.evidence[idx]
     r = metrics.review_text(conn, m["review_id"])
-    body = e(clean_text(r["text_translated"] or r["text"]))
-    q = e(m["quote"])
+    body = e(hide_names(clean_text(r["text_translated"] or r["text"]), place["name"]))
+    q = e(hide_names(m["quote"], place["name"]))
     body = body.replace(q, f"<mark>{q}</mark>", 1) if q in body else body
     when = date.fromisoformat(r["published_at"][:10]).strftime("%d %b %Y")
     reply = "✓ owner replied" if r["owner_reply"] else "no reply yet"
@@ -300,7 +301,7 @@ for i, it in enumerate(strong["items"]):
     st.markdown(f"""<div class="rr-strength" style="background:{colours[i]};color:{fg}">
 <div style="font-size:17px;font-weight:800">{e(it['label'])}</div>
 <div class="n">{it['n']} of {strong['good_with_text']} good reviews ({100 * it['share']:.0f}%)</div>
-<div class="q">“{e(it['quote']['quote'])}”</div></div>""", unsafe_allow_html=True)
+<div class="q">“{e(hide_names(it['quote']['quote'], place['name']))}”</div></div>""", unsafe_allow_html=True)
 
 
 # ---------------- 5 · Rating trend ----------------
