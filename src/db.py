@@ -43,6 +43,41 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 CREATE INDEX IF NOT EXISTS idx_reviews_place_date ON reviews(place_id, published_at);
+
+-- Spec 02: what each review is about. One row per (review, aspect) mention.
+CREATE TABLE IF NOT EXISTS aspects (
+    review_id   TEXT NOT NULL REFERENCES reviews(review_id),
+    aspect      TEXT NOT NULL,   -- a key from src/aspects.py
+    sentiment   TEXT NOT NULL,   -- pos / neg / neutral
+    quote       TEXT NOT NULL    -- exact phrase from the review (checked in code)
+);
+CREATE INDEX IF NOT EXISTS idx_aspects_review ON aspects(review_id);
+
+-- Which reviews have been tagged (some have no aspects, e.g. "ok ok").
+CREATE TABLE IF NOT EXISTS tagged_reviews (
+    review_id   TEXT PRIMARY KEY REFERENCES reviews(review_id),
+    model       TEXT,
+    tagged_at   TEXT
+);
+
+-- Dishes named in reviews (D9). `dish` is the merged name, set per place.
+CREATE TABLE IF NOT EXISTS dish_mentions (
+    review_id   TEXT NOT NULL REFERENCES reviews(review_id),
+    dish_raw    TEXT NOT NULL,   -- as written: "chkn biriyani"
+    dish        TEXT,            -- merged: "Chicken biryani"
+    sentiment   TEXT NOT NULL,
+    aspect      TEXT,
+    quote       TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_dish_review ON dish_mentions(review_id);
+
+-- The spelling-merge mapping per place; edit by hand to fix a merge.
+CREATE TABLE IF NOT EXISTS dishes (
+    place_id    TEXT NOT NULL,
+    dish        TEXT NOT NULL,
+    variants    TEXT NOT NULL,   -- JSON list of dish_raw spellings
+    PRIMARY KEY (place_id, dish)
+);
 """
 
 

@@ -166,3 +166,23 @@ portfolio.
   aspect analysis (Day 2) will work on far fewer reviews than the star counts
   suggest, so "bad reviews this month" numbers will be small. Keep counts
   visible on the dashboard.
+
+## D12: The aspect list (Day 2, 2026-11-25)
+- **Context:** Spec 02 asks for 8–12 aspects. Drafted from 60 real reviews of
+  the 3 places rather than a generic list.
+- **Options:** the spec's 12 examples · a list drawn from our own reviews.
+- **Decision:** 11 aspects in `src/aspects.py`: food taste, food quality &
+  safety, portion & value, wait time, staff behaviour, order accuracy,
+  cleanliness, ambience & comfort, location & parking, billing & policies, and
+  a new **hype vs reality** ("overhyped", "not as good as Instagram"), which
+  comes up again and again for Meghana and is a different fix from bad taste.
+  Delivery left out (few mentions); no non-food list (D2). Vague praise ("nice
+  place") gets no aspect rather than a guess.
+- **Trade-off:** fits these places well but is food-specific; a clinic or
+  salon would need its own list. Tags whose quote isn't word-for-word in the
+  review are dropped, so we lose a few real tags to keep zero made-up ones.
+- **Result:** 470/470 reviews tagged, 0 parse failures, 98.5–99.7% of quotes
+  found (the rest dropped), $0 on the free tier, ~1.5–2.5 min per place.
+  Top problems: Meghana wait time (17 neg) and hype (12 neg); Café Coffee Day
+  staff behaviour (20 neg) and billing & policies (14 neg); Sanshu's portion &
+  value (11 neg).
