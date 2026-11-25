@@ -45,3 +45,33 @@ LABELS: dict[str, str] = {
 }
 
 SENTIMENTS = ["pos", "neg", "neutral"]
+
+# The owner's words, used on the dashboard (spec 03: "Slow service", not
+# "Wait time"). Problems and praise read differently for the same aspect.
+PROBLEM_LABELS: dict[str, str] = {
+    "food_taste": "Taste",
+    "food_quality": "Food quality & safety",
+    "portion_value": "Price vs portion size",
+    "wait_time": "Slow service & waiting",
+    "staff": "Staff behaviour",
+    "order_accuracy": "Wrong or missing items",
+    "cleanliness": "Cleanliness",
+    "ambience": "Crowding, noise & comfort",
+    "location_parking": "Location & parking",
+    "billing_policies": "Billing & rules",
+    "hype": "Not living up to the hype",
+}
+
+PRAISE_LABELS: dict[str, str] = {
+    "food_taste": "Taste of the food",
+    "food_quality": "Fresh, good-quality food",
+    "portion_value": "Good value for money",
+    "wait_time": "Quick service",
+    "staff": "Friendly, helpful staff",
+    "order_accuracy": "Orders served right",
+    "cleanliness": "Clean place",
+    "ambience": "Ambience & comfort",
+    "location_parking": "Convenient location",
+    "billing_policies": "Fair billing",
+    "hype": "Lives up to the hype",
+}

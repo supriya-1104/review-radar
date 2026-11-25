@@ -186,3 +186,44 @@ portfolio.
   Top problems: Meghana wait time (17 neg) and hype (12 neg); Café Coffee Day
   staff behaviour (20 neg) and billing & policies (14 neg); Sanshu's portion &
   value (11 neg).
+
+## D13: Thin data: widen the window; any negative mention is a complaint (Day 3, 2026-11-25)
+- **Context:** The mockup assumed ~13 bad reviews in the last 30 days. Real
+  data (bad reviews with text, last 30 / 90 days / 12 months): Meghana 12 / 30
+  / 41, Sanshu's 0 / 1 / 15, Café Coffee Day 0 / 0 / 17. A strict 30-day
+  "Fix first" would be empty for both cafes. Meghana also has 40 complaints
+  inside 4–5★ reviews ("great biryani but so crowded").
+- **Options:** always 30 days (honest but empty) · always 90 days (steadier,
+  slower to catch new problems) · widen only when needed. Complaints: only in
+  1–3★ reviews (spec) · any negative mention.
+- **Decision:** complaint sections use the last 30 days if they hold >= 10
+  complaints, else 90 days, else 12 months, with a visible label explaining
+  why. The summary card and trend chart always show the true 30-day and
+  monthly numbers. A complaint is any negative aspect tag in any review; the
+  text shows how many came from 1–3★ reviews. "A normal month" = average per
+  window over up to 3 windows before, only where we have data; if there is less
+  than one window of history, no comparison is shown.
+- **Trade-off:** something always shows, but the two sections can cover a
+  different period from the summary card (must be labelled clearly). Counting
+  complaints from happy customers adds signal, but a 5★ "a bit crowded" counts
+  the same as a 1★ rant in the counts (the ranking in D14 weights by stars).
+- **Result:**
+
+## D14: "Fix first" formula = stars lost (B), not the PRD formula (A) (Day 3, 2026-11-25)
+- **Context:** PRD §5 proposed `share x rating drag x trend` (A). The playbook
+  asks to compare two versions on the 3 places.
+- **Options:** A (PRD) · B "stars lost": each complaining review's (5 − stars),
+  split across the aspects it complains about, summed per aspect.
+- **Comparison:** #1 identical for all 3 places (Meghana: slow service 9.8
+  stars lost; Café Coffee Day: staff behaviour 22.0; Sanshu's: price vs portion
+  17.5). Only Meghana #2 differed: A "Taste" (3 complaints, boosted 2x because
+  it rose from ~1 to 3) vs B "Food quality & safety" (2 complaints, 1★
+  reviews, one food poisoning). A's trend factor swings 0.5–3x on counts of
+  1–3, and maxed out (3x) for Café Coffee Day against a 3-year-old baseline.
+- **Decision:** B. One sentence an owner understands ("these 5 complaints cost
+  you 9.8 stars"), steady with small numbers. "Rising vs a normal month" is
+  still shown as a badge, it just doesn't multiply the score.
+- **Trade-off:** B reacts more slowly to a brand-new problem and favours
+  aspects that appear in very angry reviews. Like A, it ignores how costly a
+  fix is, which the owner knows better than we do.
+- **Result:**
