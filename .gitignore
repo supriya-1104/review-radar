@@ -12,3 +12,6 @@ data/cache/
 # Database holds scraped review text: never commit it
 data/*.db
 data/*.db-journal
+
+# Owner-approved reply drafts (reply to real reviews): keep local
+data/replies.json

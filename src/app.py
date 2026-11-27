@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # so `src.` imp
 import plotly.graph_objects as go
 import streamlit as st
 
-from src import db, metrics, summary
+from src import db, metrics, replies, summary, views
 from src.privacy import hide_names
 from src.tag import clean_text
 
@@ -99,6 +99,12 @@ div[data-testid="stElementContainer"]:has(.rr-tabs) {{ position: sticky; top: 0;
 .rr-nav a .i {{ display: block; font-size: 19px; line-height: 1.3; }}
 .rr-nav a .dot {{ position: absolute; top: -2px; right: 12px; background: {CORAL}; color: {INK}; border-radius: 999px;
   font-size: 10px; font-weight: 800; padding: 0 5px; }}
+.st-key-rr-bottom {{ position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(430px, 100%);
+  background: {INK}; border-radius: 22px 22px 0 0; padding: 6px 8px 10px; z-index: 100; }}
+.st-key-rr-bottom button {{ background: transparent !important; border: none !important; color: #fff !important;
+  opacity: .65; min-height: 48px; padding: 2px !important; }}
+.st-key-rr-bottom button[kind="primary"] {{ opacity: 1; background: rgba(255,255,255,.12) !important; }}
+.st-key-rr-bottom button p {{ font-size: 11.5px !important; font-weight: 600; line-height: 1.25; white-space: pre-line; color: #fff !important; }}
 div[data-testid="stSelectbox"] label, div[data-testid="stSegmentedControl"] label {{ font-size: 12px !important; }}
 </style>
 """, unsafe_allow_html=True)
@@ -162,6 +168,32 @@ st.markdown(
     f"<div class='rr-muted'>{e(place.get('category') or '')} · All-time Google rating "
     f"<b>{stars(place.get('total_score'))}</b> · {place.get('reviews_count', 0):,} reviews on Google</div>",
     unsafe_allow_html=True)
+
+
+def bottom_nav() -> None:
+    """Sticky bottom bar (spec 03 §7). Real buttons, so screens keep their state."""
+    current = st.session_state.get("view", "dash")
+    saved = replies.for_place(place_id)
+    todo = sum(1 for (rid,) in conn.execute(
+        "SELECT review_id FROM reviews WHERE place_id = ? AND stars <= 3 AND has_text = 1 "
+        "AND (owner_reply IS NULL OR owner_reply = '')", (place_id,)) if rid not in saved)
+    with st.container(key="rr-bottom"):
+        cols = st.columns(4)
+        nav = [("dash", "▦  \nDashboard"), ("reviews", "☰  \nAll reviews"),
+               ("ask", "✦  \nAsk analyst"), ("replies", f"✉ {todo}  \nReplies")]
+        for col, (v, label) in zip(cols, nav):
+            if col.button(label, key=f"nav-{v}", type="primary" if v == current else "secondary",
+                          width="stretch"):
+                st.session_state["view"] = v
+                st.rerun()
+
+
+view = st.session_state.get("view", "dash")
+if view != "dash":
+    {"ask": views.ask_view, "replies": views.replies_view, "reviews": views.reviews_view}[view](
+        conn, place_id, place["name"])
+    bottom_nav()
+    st.stop()
 
 
 # ---------------- 1 · summary card ----------------
@@ -284,8 +316,10 @@ else:
     if b2.button("▶", key=f"{key}-n", width="stretch"):
         st.session_state[key] = idx + 1
         st.rerun()
-    b3.button("✍ Draft reply (Day 4)", key=f"{key}-d", disabled=True, width="stretch",
-              help="Reply drafts come with the AI analyst. Saving or posting always needs your approval.")
+    if b3.button("✍ Reply to this", key=f"{key}-d", width="stretch"):
+        st.session_state[f"{key}-open"] = m["review_id"]
+    if st.session_state.get(f"{key}-open") == m["review_id"]:
+        views.reply_box(conn, place_id, place["name"], m["review_id"], f"fix-{views.short_key(m['review_id'])}")
 
 
 # ---------------- 4 · What's working ----------------
@@ -406,13 +440,7 @@ st.markdown(f"<div class='rr-muted'>{foot} Counts are complaints; one review can
 
 # ---------------- 7 · bottom bar ----------------
 
-badge = metrics.unreplied_bad(conn, place_id)
-st.markdown(f"""<div class="rr-nav">
-<a class="on" href="#"><span class="i">▦</span>Dashboard</a>
-<a title="Coming soon: every review, filterable"><span class="i">☰</span>All reviews</a>
-<a title="Coming on Day 4"><span class="i" style="color:{YELLOW}">✦</span>Ask analyst</a>
-<a title="Coming on Day 4: drafts waiting for your approval"><span class="i">✉</span>Replies<span class="dot">{badge}</span></a>
-</div>""", unsafe_allow_html=True)
+bottom_nav()
 
 # Scroll-spy: highlight the tab of the section on screen (runs in the parent page).
 st.iframe("""<script>

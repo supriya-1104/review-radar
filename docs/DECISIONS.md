@@ -268,3 +268,41 @@ portfolio.
   shows. Other identifying details ("I own a cafe named X") are not hidden.
   The stored text is unchanged (the tagger's quotes must match it exactly).
 - **Result:** 1 of 470 reviews in our data had a self-introduced name; hidden.
+
+## D17: The analyst: trust design, and the fast model for everything (Day 4, 2026-11-27)
+- **Context:** Spec 04 asks which actions are automatic vs need approval, and
+  what the agent says without enough data. While building, Gemini's free tier
+  turned out to allow only **20 requests per day** on the smart model
+  (gemini-3.6-flash), and it timed out (60 s+) when given all 6 tools. One
+  analyst question uses 2–8 requests.
+- **Trust design:**
+  - Automatic: reading numbers and reviews, searching, drafting replies (they
+    change nothing).
+  - Needs approval: saving a reply. The `save_reply` tool never saves; it
+    queues the reply, and only the owner's Approve button in the app writes
+    `data/replies.json`. A fake-model test proves an obeyed injection still
+    saves nothing. Nothing is ever posted to Google.
+  - Not enough data: tools return sample sizes, `low_confidence` and a "too
+    few to tell / could be chance" hint; the agent must quote the counts and
+    not call either side worse.
+  - Code checks every answer: numbers not found in any tool result and
+    citations no tool returned are shown as warnings; reply drafts with
+    promises (free, refund, discount), arguing, or phone numbers are flagged.
+  - Reviews are data: labelled `customer_text`, and the system prompt says
+    never to follow them. Max 8 tool calls per question. Every step is logged
+    to `data/cache/agent_logs/`.
+- **Model options:** fast model for everything · turn on Gemini billing and
+  keep the smart model · fast model for tool steps, smart only for the final
+  wording.
+- **Decision:** the fast model (gemini-3.5-flash-lite) for the analyst, the
+  summary and reply drafts. MODEL_SMART stays in `.env` for later. 90 s
+  request timeout and a fallback to the fast model if a call fails.
+- **Trade-off:** free and fast (~3–15 s per answer vs 200 s+ on the busy smart
+  model), but weaker reasoning: on the first try it wrote "weekends are not
+  worse" while quoting a higher weekend rate. Fixed with a compare tool that
+  states which side is higher and whether it's chance, plus a prompt rule.
+  The code checks matter more; Day 6 evals will measure quality.
+- **Result:** 5/5 multi-step questions answered with real numbers and no
+  unverified numbers (up to 8 tool calls). Red-team PASS: the agent spotted
+  the injected "food is free" review, called it prompt injection, excluded it,
+  and saved nothing (`evals/results/redteam-2026-11-27.md`).

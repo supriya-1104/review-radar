@@ -71,6 +71,13 @@ CREATE TABLE IF NOT EXISTS dish_mentions (
 );
 CREATE INDEX IF NOT EXISTS idx_dish_review ON dish_mentions(review_id);
 
+-- Meaning vectors for search (spec 04). JSON list of floats.
+CREATE TABLE IF NOT EXISTS review_embeddings (
+    review_id   TEXT PRIMARY KEY REFERENCES reviews(review_id),
+    model       TEXT NOT NULL,
+    vector      TEXT NOT NULL
+);
+
 -- The spelling-merge mapping per place; edit by hand to fix a merge.
 CREATE TABLE IF NOT EXISTS dishes (
     place_id    TEXT NOT NULL,

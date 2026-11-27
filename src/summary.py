@@ -1,6 +1,6 @@
 """The one-sentence summary and "Do this next" on the summary card (spec 03, J1).
 
-MODEL_SMART writes them from numbers computed in src/metrics.py and real
+MODEL_FAST (D17) writes them from numbers computed in src/metrics.py and real
 quotes only. The code then checks:
   - every cited review is one we gave it (and exists),
   - every number in the text is one we gave it (no made-up numbers).
@@ -111,7 +111,7 @@ def template(s: metrics.Summary, w: metrics.Window, top: list) -> dict:
 def write_summary(place_name: str, s: metrics.Summary, w: metrics.Window,
                   top: list, strengths: dict) -> dict:
     facts, evidence = build_facts(s, w, top, strengths)
-    result = llm.generate_json(prompt(place_name, facts), SCHEMA, model_setting="MODEL_SMART")
+    result = llm.generate_json(prompt(place_name, facts), SCHEMA, model_setting="MODEL_FAST")  # D17
     period = w.label.lower().replace("last ", "") if w.widened else None
     problem = check(result, facts, evidence, period)
     if problem:

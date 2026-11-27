@@ -69,3 +69,24 @@ agent" story.
   phone size; the playbook's "rewind" to compare A vs B (we compared both in
   one table instead).
 - **Commit(s):** metrics + A vs B; AI summary with checks; dashboard.
+
+## Day 4: 2026-11-26 to 2026-11-27
+- **Goal:** the AI analyst (a real agent: picks its own tools) with reply
+  drafts and an approval gate; prove a prompt-injection review can't steer it.
+- **Prompts that worked:** "show me the tool descriptions before writing code"
+  (they are how the model decides what to do); asking 5 multi-step questions
+  and reading every tool call, not just the answer.
+- **What broke / surprised me:**
+  - The smart Gemini model allows only 20 requests/day on the free tier and
+    hung for minutes with 6 tools. Switched everything to the fast model (D17).
+  - The fast model's first answer contradicted its own numbers ("weekends are
+    not worse" next to a higher weekend rate). Fixed with a comparison tool
+    that says which side is higher and whether it's chance.
+  - Citations like [R1, R4] weren't linked; Google review ids share a long
+    prefix, so widget keys collided. Both fixed.
+  - Red-team: the agent didn't just ignore the injected review, it named it as
+    prompt injection and left it out.
+- **Claude Code feature learned:** plan mode for multi-file work; a fake model
+  in tests to prove the approval gate without calling the AI.
+- **Commit(s):** analyst agent, tools, search, Ask analyst + Replies screens,
+  red-team eval.
