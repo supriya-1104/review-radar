@@ -21,7 +21,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-from src import config, db, llm, metrics, tools
+from src import config, db, llm, metrics, tools, tracing
 
 MAX_STEPS = 8
 LOG_DIR = config.CACHE_DIR / "agent_logs"
@@ -105,7 +105,22 @@ def check_answer(text: str, tool_outputs: list[str], question: str, refs: dict) 
 
 def ask(question: str, ctx: tools.ToolContext, history: list | None = None,
         model_setting: str = "MODEL_FAST") -> tuple[Answer, list]:  # D17: free-tier limits
-    """Run the loop. Returns (answer, updated history for follow-up questions)."""
+    """Run the loop, traced in Phoenix as one AGENT span (spec 05).
+    Returns (answer, updated history for follow-up questions)."""
+    tracing.setup()
+    with tracing.span(f"analyst: {question[:70]}", "AGENT", question,
+                      place=ctx.place_name, session__id=f"{ctx.place_id}-{ctx.as_of}") as sp:
+        ans, contents = _run(question, ctx, history, model_setting)
+        sp.output(ans.text)
+        sp.attr("review_radar.tool_calls", len(ans.steps))
+        sp.attr("review_radar.unverified_numbers", ans.unverified_numbers)
+        sp.attr("review_radar.bad_refs", ans.bad_refs)
+        sp.attr("review_radar.seconds", ans.seconds)
+    return ans, contents
+
+
+def _run(question: str, ctx: tools.ToolContext, history: list | None,
+         model_setting: str) -> tuple[Answer, list]:
     from google.genai import types
 
     place = metrics.place_header(ctx.conn, ctx.place_id)
@@ -153,7 +168,10 @@ def ask(question: str, ctx: tools.ToolContext, history: list | None = None,
                 ans.hit_step_limit = True
             else:
                 t1 = time.time()
-                result = tools.run_tool(ctx, call.name, dict(call.args or {}))
+                with tracing.span(f"tool: {call.name}", "TOOL", dict(call.args or {}),
+                                  tool__name=call.name) as tsp:
+                    result = tools.run_tool(ctx, call.name, dict(call.args or {}))
+                    tsp.output(result)
                 calls_made += 1
                 step = {"run": run_id, "step": calls_made, "tool": call.name, "args": dict(call.args or {}),
                         "result": result, "ms": round(1000 * (time.time() - t1)),

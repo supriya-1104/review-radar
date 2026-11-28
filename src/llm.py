@@ -102,7 +102,13 @@ def generate_raw(model: str, contents: list, cfg) -> tuple[object, dict, bool]:
     if path.exists():
         usage["cached"] += 1
         data = json.loads(path.read_text(encoding="utf-8"))
-        return types.GenerateContentResponse.model_validate(data["response"]), data["usage"], True
+        resp = types.GenerateContentResponse.model_validate(data["response"])
+        from src import tracing  # cached answers still show up in the trace timeline
+        with tracing.span("gemini (cached, no API call)", "LLM", contents[-1].model_dump(mode="json", exclude_none=True),
+                          llm__model_name=model) as sp:
+            calls = [f"{c.name}({json.dumps(dict(c.args or {}), ensure_ascii=False)})" for c in (resp.function_calls or [])]
+            sp.output("calls: " + ", ".join(calls) if calls else (resp.text or ""))
+        return resp, data["usage"], True
     resp = _with_retry(lambda: _get_client().models.generate_content(model=model, contents=contents, config=cfg))
     u = _usage(resp)
     usage["calls"] += 1

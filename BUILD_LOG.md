@@ -90,3 +90,19 @@ agent" story.
   in tests to prove the approval gate without calling the AI.
 - **Commit(s):** analyst agent, tools, search, Ask analyst + Replies screens,
   red-team eval.
+
+## Day 5: 2026-11-27 to 2026-11-28
+- **Goal:** trace every AI step in Phoenix, run 30 realistic questions, and
+  find and count the analyst's failures.
+- **Prompts that worked:** writing a "what a good answer looks like" line for
+  each question before running anything, so judging isn't done by feel.
+- **What broke / surprised me:** the first traces never arrived because the
+  test ran while Phoenix was still starting; cached answers made no API call,
+  so I added a "cached" span to keep the timeline complete. The run stopped at
+  question 22 when the laptop lost its connection overnight; made it resumable
+  across days.
+- **Error analysis:** (fill in: my pass/fail count, top categories, agreement
+  with Claude's blind pass)
+- **Claude Code feature learned:** running long jobs in the background;
+  launch configs for Phoenix and the dashboard.
+- **Commit(s):** Phoenix tracing, 30 questions + run script, worksheet.

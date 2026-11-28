@@ -15,3 +15,7 @@ data/*.db-journal
 
 # Owner-approved reply drafts (reply to real reviews): keep local
 data/replies.json
+
+# Eval run outputs quote real reviews: keep local (summaries are committed)
+evals/results/runs-*
+evals/results/claude-verdicts-*
